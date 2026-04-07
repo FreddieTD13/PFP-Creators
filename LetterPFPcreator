@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Letter Profile Picture Maker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500&family=Yantramanav:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --google-gray-50: #f8f9fa;
+            --google-gray-100: #f1f3f4;
+            --google-gray-200: #e8eaed;
+            --google-gray-300: #dadce0;
+            --google-gray-500: #9aa0a6;
+            --google-gray-700: #5f6368;
+            --google-gray-900: #202124;
+            --google-blue: #1a73e8;
+            --google-blue-hover: #185abc;
+            --surface: #ffffff;
+            --on-surface: #202124;
+            --on-surface-variant: #5f6368;
+            --border: #dadce0;
+            --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        [data-theme="dark"] {
+            --google-gray-50: #202124;
+            --google-gray-100: #303134;
+            --google-gray-200: #3c4043;
+            --google-gray-300: #5f6368;
+            --google-gray-700: #bdc1c6;
+            --google-gray-900: #e8eaed;
+            --google-blue: #8ab4f8;
+            --google-blue-hover: #aecbfa;
+            --surface: #202124;
+            --on-surface: #e8eaed;
+            --on-surface-variant: #9aa0a6;
+            --border: #3c4043;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Yantramanav', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--surface);
+            color: var(--on-surface);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            transition: background-color var(--transition), color var(--transition);
+        }
+
+        header {
+            height: 64px;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            background: var(--surface);
+            z-index: 100;
+            transition: background-color var(--transition), border-color var(--transition);
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 20px;
+            color: var(--google-gray-700);
+        }
+
+        .google-logo { 
+            font-weight: 500; 
+            color: var(--on-surface);
+        }
+
+        .credit-link {
+            font-size: 14px;
+            color: var(--on-surface-variant);
+            text-decoration: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: background var(--transition), color var(--transition);
+        }
+
+        .credit-link:hover {
+            background: var(--google-gray-100);
+            color: var(--google-blue);
+        }
+
+        .credit-link span {
+            font-weight: 500;
+        }
+
+        main {
+            flex: 1;
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 48px 16px;
+        }
+
+        .page-header { text-align: center; margin-bottom: 32px; }
+        h1 { font-size: 28px; font-weight: 400; margin: 0 0 8px 0; }
+        .subtext { color: var(--on-surface-variant); font-size: 16px; }
+
+        .settings-card {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 24px;
+            transition: border-color var(--transition);
+        }
+
+        .section {
+            padding: 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: border-color var(--transition);
+        }
+
+        .section:last-child { border-bottom: none; }
+
+        .preview-circle {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 90px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(60,64,67,0.3);
+            transition: background 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.2s ease;
+            font-weight: 400;
+            line-height: 1; 
+            text-align: center;
+        }
+
+        .preview-circle:active {
+            transform: scale(0.95);
+        }
+
+        .controls-grid {
+            width: 100%;
+            max-width: 500px;
+            display: grid;
+            gap: 20px;
+        }
+
+        .field-group { display: flex; flex-direction: column; gap: 6px; }
+        label { font-size: 14px; font-weight: 500; color: var(--on-surface); }
+
+        input[type="text"], select {
+            height: 48px;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 16px;
+            background: transparent;
+            color: var(--on-surface);
+            outline: none;
+            transition: border-color var(--transition), box-shadow var(--transition);
+            font-family: 'Yantramanav', sans-serif;
+        }
+
+        input:focus, select:focus { 
+            border: 2px solid var(--google-blue); 
+            padding: 11px; 
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .palette-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .color-swatch {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: transform 0.2s, border-radius 0.2s, border-color 0.2s;
+        }
+
+        .color-swatch:hover {
+            transform: scale(1.15);
+        }
+
+        .color-swatch.active {
+            border-color: var(--on-surface);
+            transform: scale(1.1);
+            border-radius: 50%;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .btn {
+            height: 36px;
+            padding: 0 24px;
+            border-radius: 18px; 
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--google-blue);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: background var(--transition), border-color var(--transition), transform 0.1s;
+            font-family: 'Yantramanav', sans-serif;
+        }
+
+        .btn:hover { background: rgba(26, 115, 232, 0.08); }
+        .btn:active { transform: scale(0.97); }
+
+        .btn-primary { 
+            background: var(--google-blue); 
+            color: white; 
+            border: none; 
+        }
+        .btn-primary:hover { 
+            background: var(--google-blue-hover); 
+            box-shadow: 0 1px 3px rgba(60,64,67,0.3);
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            padding: 8px;
+            border-radius: 50%;
+            cursor: pointer;
+            color: var(--google-gray-700);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background var(--transition);
+        }
+
+        .icon-btn:hover { background: var(--google-gray-100); }
+        canvas { display: none; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo-section">
+        <span class="google-logo">Profile Picture Maker</span>
+        <a href="https://www.youtube.com/@FreddieTD13" target="_blank" class="credit-link">
+            Made by <span>FreddieTD13</span>
+        </a>
+    </div>
+    <div class="header-actions">
+        <button class="icon-btn" onclick="toggleTheme()" title="Toggle Theme">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1z"/></svg>
+        </button>
+    </div>
+</header>
+
+<main>
+    <div class="page-header">
+        <h1>Google Letter Profile Picture Maker</h1>
+        <p class="subtext">A profile picture helps people recognize you and lets you know when you’re signed in to your account</p>
+    </div>
+
+    <div class="settings-card">
+        <div class="section">
+            <div id="pfp-preview" class="preview-circle">G</div>
+            <p style="font-size: 14px; color: var(--on-surface-variant);">Visible to anyone, across Google services</p>
+        </div>
+
+        <div class="section">
+            <div class="controls-grid">
+                <div class="field-group">
+                    <label>Language</label>
+                    <select id="langSelect">
+                        <option value="latin">English</option>
+                        <option value="polish">Polish</option>
+                        <option value="vietnamese">Vietnamese</option>
+                        <option value="greek">Greek</option>
+                        <option value="icelandic">Icelandic</option>
+                        <option value="hindi">Hindi</option>
+                        <option value="thai">Thai</option>
+                        <option value="abkhaz">Abkhaz</option>
+                        <option value="churchslavonic">Church Slavonic</option>
+                        <option value="spanish">Spanish</option>
+                        <option value="arabic">Arabic</option>
+                        <option value="hebrew">Hebrew</option>
+                        <option value="russian">Russian</option>
+                        <option value="ukrainian">Ukrainian</option>
+                        <option value="mongolian">Mongolian</option>
+                        <option value="coptic">Coptic</option>
+                        <option value="ipa">IPA (Phonetic)</option>
+                        <option value="hiragana">Japanese [Hiragana]</option>
+                        <option value="katakana">Japanese [Katakana]</option>
+                    </select>
+                </div>
+
+                <div class="field-group">
+                    <label>Initials</label>
+                    <input type="text" id="initialInput" maxlength="2" placeholder="e.g. AB">
+                </div>
+
+                <div class="field-group">
+                    <label>Background Color (Google Palette)</label>
+                    <div class="palette-container" id="palette"></div>
+                </div>
+            </div>
+
+            <div class="actions" style="width: 100%; max-width: 500px;">
+                <button class="btn" id="randomBtn">Randomize</button>
+                <button class="btn btn-primary" id="downloadBtn">Download</button>
+            </div>
+        </div>
+    </div>
+</main>
+
+<canvas id="exportCanvas" width="512" height="512"></canvas>
+
+<script>
+    const preview = document.getElementById('pfp-preview');
+    const input = document.getElementById('initialInput');
+    const langSelect = document.getElementById('langSelect');
+    const palette = document.getElementById('palette');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const randomBtn = document.getElementById('randomBtn');
+    const canvas = document.getElementById('exportCanvas');
+
+    const googleColors = [
+        "#a346ba", "#7b1fa2", "#78909c", "#546e7a", "#ec407a", 
+        "#c2185b", "#5c6bc0", "#4285f4", "#039be5", "#0277bd", 
+        "#00acc1", "#00897b", "#004d40", "#7cb342", "#33691e", 
+        "#8d6e63", "#5d4037", "#7e57c2", "#f4511e", "#e64a19", "#bf360c"
+    ];
+
+    const charSets = {
+        latin: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
+        polish: "AĄBĆDEĘŁŃOÓPRSŚTUWYZŹŻaąbćdeęłńoóprsśtuwyzźż",
+        vietnamese: "AĂÂBCDĐEÊGHIKLMNOÔƠPQRSTUƯVXYaăâbcdđeêghiklmnoôơpqrstuưvxy",
+        greek: "ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩαβγδεζηθικλμνξοπρστυφχψω",
+        icelandic: "AÁBDÐEÉFGHIÍJKLMNOÓPRSTUÚVXYÝÞÆÖaábdðeéfghiíjklmnoóprstuúvxyýþæö",
+        hindi: "अआइईउऊऋएऐओऔकखगघङचछजझञटठडढणतथदधनपफबभमयरलवशषसह",
+        thai: "กขฃคฅฆงจฉชซฌญฎฏฐฑฒณดตถทธนบปผฝพฟภมยรลวศษสหฬอฮ",
+        abkhaz: "АБВГДЕЖЗӠИКЛМНОПРСТУФХЦЧШЫЬҔӔӘҼҾҨҌҎабвгдежзӡиклмнопрстуфхцчшыьҕӕәҽҿҩҍҏ",
+        churchslavonic: "АБВΓДЕЖЅЗИІКЛМНОПРСТУФХЦЧШЩЪЫЬѢЮѦѪѮѰѲѴѶѸѺѼѾҀабвгдежѕзиіклмнопрстуфхцчшщъыьѣюѧѫѯѱѳѵѷѹѻѽѿҁ",
+        spanish: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÁÉÍÓÚÑáéíóúñ",
+        arabic: "ابتثجحخدذرزسشصضطظعغفقكلمنهوي",
+        hebrew: "אבגדהוזחטיכלמנסעפצקרשת",
+        russian: "АБВГДЕЁЖЗИЙКΛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклmнопрстуфхцчшщъыьэюя",
+        ukrainian: "АБВГДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯабвгдеєжзиіїйклmнопрстуфхцчшщьюя",
+        mongolian: "АБВГДЕЁЖЗИЙКΛМНОӨПРСТУҮФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмноөпрстуүφχцчшщъыьэюя",
+        coptic: "ⲀⲂⲄⲆⲈⲊⲌⲎⲐⲒⲔⲖⲘⲚⲜⲞⲠⲢⲤⲦⲨⲪⲬⲮⲰϢϤϦϨϪϬϮⲁⲃⲄⲇⲉⲋⲍⲏⲑⲓⲕⲗⲙⲛⲝⲟⲡⲣⲥⲣⲧⲩⲫⲭⲯⲱϣϥϧϩϫϭϯ",
+        ipa: "pbtkdɡmɱnɳɲŋɴʙrʀⱱɾɽɸβfvθðszʃʒʃʒʂʐçʝxɣχʁħʕhɦɬɮʋɹɻjɰlɭʎʟieæaɒ",
+        hiragana: "あいうえおかきくけこがぎぐげござじずぜぞさしすせそたちつてとだぢづでどなにぬねのはひふへほばびぶべぼぱぴぷぺぽまみむめもやゃゆゅよょらりるれろわをんっゔゕゖ",
+        katakana: "アイウエオカキクケコガギグゲゴザジズゼゾサシスセソタチツテトダヂヅデドナニヌネノハヒフヘホバビブベボパピプペポマミムメモヤャユュヨョラリルレロワヲンッヴヵヶ"
+    };
+
+    let currentColor = googleColors[0];
+
+    googleColors.forEach((color, idx) => {
+        const swatch = document.createElement('div');
+        swatch.className = 'color-swatch' + (idx === 0 ? ' active' : '');
+        swatch.style.background = color;
+        swatch.dataset.color = color;
+        swatch.onclick = () => selectColor(color, swatch);
+        palette.appendChild(swatch);
+    });
+
+    function selectColor(color, element) {
+        document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+        element.classList.add('active');
+        currentColor = color;
+        updateDisplay();
+    }
+
+    function toggleTheme() {
+        const current = document.documentElement.getAttribute('data-theme');
+        document.documentElement.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+    }
+
+    function updateDisplay() {
+        const val = input.value || '?';
+        preview.innerText = val;
+        preview.style.backgroundColor = currentColor;
+        
+        const isRTL = /[\u0600-\u06FF\u0590-\u05FF]/.test(val);
+        preview.style.direction = isRTL ? 'rtl' : 'ltr';
+        
+
+        const isJapanese = /[\u3040-\u309F\u30A0-\u30FF]/.test(val);
+        preview.style.fontFamily = isJapanese ? "'Noto Sans JP', sans-serif" : "'Yantramanav', sans-serif";
+        
+        const isMongolianClassical = /[\u1800-\u18AF]/.test(val);
+        if (isMongolianClassical) {
+            preview.style.writingMode = "vertical-lr";
+        } else {
+            preview.style.writingMode = "horizontal-tb";
+        }
+
+        const charCount = Array.from(val).length;
+        
+
+        let fontSize;
+        if (isJapanese) {
+            fontSize = charCount > 1 ? 55 : 75;
+        } else {
+            fontSize = charCount > 1 ? 65 : 90;
+        }
+        
+        preview.style.fontSize = fontSize + "px";
+        
+
+        preview.style.paddingTop = isJapanese ? "4px" : "0px";
+    }
+
+    function generateRandom() {
+        const lang = langSelect.value;
+        const currentSet = charSets[lang] || charSets.latin;
+        
+        const count = Math.random() > 0.5 ? 2 : 1;
+        let result = "";
+        const chars = Array.from(currentSet);
+        for(let i=0; i<count; i++) {
+            result += chars[Math.floor(Math.random() * chars.length)];
+        }
+
+        input.value = result;
+        const randomIdx = Math.floor(Math.random() * googleColors.length);
+        const randomSwatch = document.querySelectorAll('.color-swatch')[randomIdx];
+        selectColor(googleColors[randomIdx], randomSwatch);
+        updateDisplay();
+    }
+
+    langSelect.addEventListener('change', generateRandom);
+
+    input.addEventListener('input', () => {
+        const regex = /[^a-zA-Z\u00C0-\u00FF\u0104-\u017C\u0900-\u097F\u0E00-\u0E7F\u0400-\u052F\u2DE0-\u2DFF\uA640-\uA69F\u0370-\u03FF\u1800-\u18AF\u2C80-\u2CFF\u03E2-\u03EF\u0600-\u06FF\u0590-\u05FF\u3040-\u30ff\uac00-\ud7af\u1100-\u11ff]/g;
+        input.value = input.value.replace(regex, '');
+        
+        const chars = Array.from(input.value);
+        if (chars.length > 2) {
+            input.value = chars.slice(0, 2).join('');
+        }
+        updateDisplay();
+    });
+
+    randomBtn.addEventListener('click', generateRandom);
+
+    downloadBtn.addEventListener('click', () => {
+        const char = input.value || '?';
+        const ctx = canvas.getContext('2d');
+        
+
+        ctx.fillStyle = currentColor;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.fillStyle = "white";
+        
+        const charCount = Array.from(char).length;
+        const isJapanese = /[\u3040-\u309F\u30A0-\u30FF]/.test(char);
+        
+
+        let baseSize = charCount > 1 ? 220 : 320;
+        let fontSize = isJapanese ? baseSize * 0.85 : baseSize; // Japanese 15% smaller
+        
+        let fontName = isJapanese ? 'Noto Sans JP' : 'Yantramanav';
+        
+        ctx.save();
+        ctx.font = `400 ${fontSize}px ${fontName}`; 
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+
+        const isMongolianClassical = /[\u1800-\u18AF]/.test(char);
+        if (isMongolianClassical) {
+            ctx.translate(canvas.width / 2, canvas.height / 2);
+            ctx.rotate(Math.PI / 2);
+            ctx.fillText(char, 0, 0);
+        } else {
+            const verticalOffset = isJapanese ? fontSize * 0.02 : fontSize * 0.05;
+            ctx.fillText(char, canvas.width / 2, canvas.height / 2 + verticalOffset);
+        }
+        ctx.restore();
+        
+        const link = document.createElement('a');
+        link.download = `pfp-${char}.png`;
+        link.href = canvas.toDataURL();
+        link.click();
+    });
+
+    window.onload = generateRandom;
+</script>
+
+</body>
+</html>
