@@ -6,7 +6,7 @@
     <title>Google Letter Profile Picture Maker</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500&family=Yantramanav:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500&family=Yantramanav:wght@300;400;500&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root {
             --google-gray-50: #f8f9fa;
@@ -297,9 +297,12 @@
                     <label>Language</label>
                     <select id="langSelect">
                         <option value="latin">English</option>
+                        <option value="russian">Russian</option>
+                        <option value="ukrainian">Ukrainian</option>
+                        <option value="mongolian">Mongolian</option>
+                        <option value="greek">Greek</option>
                         <option value="polish">Polish</option>
                         <option value="vietnamese">Vietnamese</option>
-                        <option value="greek">Greek</option>
                         <option value="icelandic">Icelandic</option>
                         <option value="hindi">Hindi</option>
                         <option value="thai">Thai</option>
@@ -308,9 +311,6 @@
                         <option value="spanish">Spanish</option>
                         <option value="arabic">Arabic</option>
                         <option value="hebrew">Hebrew</option>
-                        <option value="russian">Russian</option>
-                        <option value="ukrainian">Ukrainian</option>
-                        <option value="mongolian">Mongolian</option>
                         <option value="coptic">Coptic</option>
                         <option value="ipa">IPA (Phonetic)</option>
                         <option value="hiragana">Japanese [Hiragana]</option>
@@ -372,7 +372,7 @@
         ukrainian: "АБВГДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯабвгдеєжзиіїйклmнопрстуфхцчшщьюя",
         mongolian: "АБВГДЕЁЖЗИЙКΛМНОӨПРСТУҮФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмноөпрстуүφχцчшщъыьэюя",
         coptic: "ⲀⲂⲄⲆⲈⲊⲌⲎⲐⲒⲔⲖⲘⲚⲜⲞⲠⲢⲤⲦⲨⲪⲬⲮⲰϢϤϦϨϪϬϮⲁⲃⲄⲇⲉⲋⲍⲏⲑⲓⲕⲗⲙⲛⲝⲟⲡⲣⲥⲣⲧⲩⲫⲭⲯⲱϣϥϧϩϫϭϯ",
-        ipa: "pbtkdɡmɱnɳɲŋɴʙrʀⱱɾɽɸβfvθðszʃʒʃʒʂʐçʝxɣχʁħʕhɦɬɮʋɹɻjɰlɭʎʟieæaɒ",
+        ipa: "pbtkdɡmɱnɳɲŋɴʙrʀⱱɾɽɸβfvθðszʃʒʃʒʂʐçʝxɣχʁħʕhɦɬɮʋɹɻjɰlɭʎʟieæaɒʔʊɪɛʌɔæəɘɤ",
         hiragana: "あいうえおかきくけこがぎぐげござじずぜぞさしすせそたちつてとだぢづでどなにぬねのはひふへほばびぶべぼぱぴぷぺぽまみむめもやゃゆゅよょらりるれろわをんっゔゕゖ",
         katakana: "アイウエオカキクケコガギグゲゴザジズゼゾサシスセソタチツテトダヂヅデドナニヌネノハヒフヘホバビブベボパピプペポマミムメモヤャユュヨョラリルレロワヲンッヴヵヶ"
     };
@@ -408,9 +408,17 @@
         const isRTL = /[\u0600-\u06FF\u0590-\u05FF]/.test(val);
         preview.style.direction = isRTL ? 'rtl' : 'ltr';
         
-
         const isJapanese = /[\u3040-\u309F\u30A0-\u30FF]/.test(val);
-        preview.style.fontFamily = isJapanese ? "'Noto Sans JP', sans-serif" : "'Yantramanav', sans-serif";
+        // Detect Cyrillic (\u0400-\u04FF), Greek (\u0370-\u03FF), or IPA (\u0250-\u02AF, \u1D00-\u1D7F, \u1D80-\u1DBF)
+        const isRobotoNeeded = /[\u0400-\u04FF\u0370-\u03FF\u0250-\u02AF\u1D00-\u1D7F]/.test(val);
+
+        if (isJapanese) {
+            preview.style.fontFamily = "'Noto Sans JP', sans-serif";
+        } else if (isRobotoNeeded) {
+            preview.style.fontFamily = "'Roboto', sans-serif";
+        } else {
+            preview.style.fontFamily = "'Yantramanav', sans-serif";
+        }
         
         const isMongolianClassical = /[\u1800-\u18AF]/.test(val);
         if (isMongolianClassical) {
@@ -420,7 +428,6 @@
         }
 
         const charCount = Array.from(val).length;
-        
 
         let fontSize;
         if (isJapanese) {
@@ -430,8 +437,6 @@
         }
         
         preview.style.fontSize = fontSize + "px";
-        
-
         preview.style.paddingTop = isJapanese ? "4px" : "0px";
     }
 
@@ -456,7 +461,8 @@
     langSelect.addEventListener('change', generateRandom);
 
     input.addEventListener('input', () => {
-        const regex = /[^a-zA-Z\u00C0-\u00FF\u0104-\u017C\u0900-\u097F\u0E00-\u0E7F\u0400-\u052F\u2DE0-\u2DFF\uA640-\uA69F\u0370-\u03FF\u1800-\u18AF\u2C80-\u2CFF\u03E2-\u03EF\u0600-\u06FF\u0590-\u05FF\u3040-\u30ff\uac00-\ud7af\u1100-\u11ff]/g;
+        // Updated regex to allow IPA range (\u0250-\u02AF) and other phonetic symbols
+        const regex = /[^a-zA-Z\u00C0-\u00FF\u0104-\u017C\u0900-\u097F\u0E00-\u0E7F\u0400-\u052F\u2DE0-\u2DFF\uA640-\uA69F\u0370-\u03FF\u1800-\u18AF\u2C80-\u2CFF\u03E2-\u03EF\u0600-\u06FF\u0590-\u05FF\u3040-\u30ff\uac00-\ud7af\u1100-\u11ff\u0250-\u02AF\u1D00-\u1DBF]/g;
         input.value = input.value.replace(regex, '');
         
         const chars = Array.from(input.value);
@@ -471,7 +477,6 @@
     downloadBtn.addEventListener('click', () => {
         const char = input.value || '?';
         const ctx = canvas.getContext('2d');
-        
 
         ctx.fillStyle = currentColor;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -480,12 +485,17 @@
         
         const charCount = Array.from(char).length;
         const isJapanese = /[\u3040-\u309F\u30A0-\u30FF]/.test(char);
+        const isRobotoNeeded = /[\u0400-\u04FF\u0370-\u03FF\u0250-\u02AF\u1D00-\u1D7F]/.test(char);
         
-
         let baseSize = charCount > 1 ? 220 : 320;
-        let fontSize = isJapanese ? baseSize * 0.85 : baseSize; // Japanese 15% smaller
+        let fontSize = isJapanese ? baseSize * 0.85 : baseSize;
         
-        let fontName = isJapanese ? 'Noto Sans JP' : 'Yantramanav';
+        let fontName = 'Yantramanav';
+        if (isJapanese) {
+            fontName = 'Noto Sans JP';
+        } else if (isRobotoNeeded) {
+            fontName = 'Roboto';
+        }
         
         ctx.save();
         ctx.font = `400 ${fontSize}px ${fontName}`; 
@@ -498,7 +508,8 @@
             ctx.rotate(Math.PI / 2);
             ctx.fillText(char, 0, 0);
         } else {
-            const verticalOffset = isJapanese ? fontSize * 0.02 : fontSize * 0.05;
+            // Slight adjustment for Roboto/Cyrillic/IPA vertical alignment
+            const verticalOffset = isJapanese ? fontSize * 0.02 : (isRobotoNeeded ? fontSize * 0.03 : fontSize * 0.05);
             ctx.fillText(char, canvas.width / 2, canvas.height / 2 + verticalOffset);
         }
         ctx.restore();
